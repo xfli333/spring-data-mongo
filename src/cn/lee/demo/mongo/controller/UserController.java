@@ -1,5 +1,6 @@
 package cn.lee.demo.mongo.controller;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,6 +25,7 @@ public class UserController {
         double sleepTime = Math.random() * 10;
         System.out.println(id + "==sleep==" + sleepTime + "====i===" + i);
         try {
+//            TimeUnit.SECONDS.sleep(Math.round(sleepTime));
             TimeUnit.SECONDS.sleep(Math.round(sleepTime));
         } catch (InterruptedException e) {
             e.printStackTrace();

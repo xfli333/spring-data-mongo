@@ -1,20 +1,15 @@
 package cn.lee.demo.mongo;
 
-import cn.lee.demo.mongo.controller.UserController;
-import cn.lee.demo.mongo.model.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.HandlerExecutionChain;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import javax.annotation.Resource;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,34 +19,37 @@ import javax.annotation.Resource;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:applicationContext.xml")
-public class TestUserController {
+public class TestUserController extends BaseControllerTest {
 
-    @Resource
-    private UserController userController;
-
-    @Resource
-    private RequestMappingHandlerAdapter handlerAdapter;
-
-    @Resource
-    private RequestMappingHandlerMapping handlerMapping;
+    private Executor executor = Executors.newFixedThreadPool(10);
+    private String id;
 
     @Test
     public void saveTest() {
+        for (int i = 0; i < 10; i++) {
+            id = i + "";
+            executor.execute(new Runnable() {
+                @Override
+                public int hashCode() {
+                    return super.hashCode();
+                }
 
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        request.setRequestURI("http://localhost:9080/mongo/user/test.frm?id=1");
-        request.setMethod(RequestMethod.GET.name());
-        try {
-            HandlerExecutionChain chain = handlerMapping.getHandler(request);
-            handlerAdapter.handle(request, response,
-                    chain.getHandler());
-//
-//            Object handler = handlerMapping.getHandler(request).getHandler();
-//            handlerAdapter.handle(request, response, handler);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+                @Override
+                public void run() {
+                    test(id + "");
+                }
+            });
         }
     }
+
+    private void test(String id) {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        request.setRequestURI("/user/test.frm");
+        request.addParameter("id", id);
+        request.setMethod(RequestMethod.GET.name());
+        this.execute(request, response);
+    }
+
+
 }
